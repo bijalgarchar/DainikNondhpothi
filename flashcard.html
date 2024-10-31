@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024, initial-scale=1.0">
     <title>Daily Lesson Plan</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
          html, body {
             width: 1024px; /* Fixed desktop width */
@@ -264,6 +266,46 @@
         margin: 5px auto;
     }
 }
+ #lessonPlanTable {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    #lessonPlanTable th,
+    #lessonPlanTable td {
+        border: 1px solid #000; /* બ્લેક બોર્ડર */
+        padding: 8px; /* પેડિંગ */
+        text-align: left; /* ટેક્સ્ટ alinhamento */
+    }
+    /* કૉલમની પહોળાઈ ઘટાડવા માટે */
+    
+    #lessonPlanTable td:nth-child(1) {
+        width: 50px; /* પહોળાઈ 50px */
+        font-size: 19px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+    #lessonPlanTable td:nth-child(2) {
+        width: 80px; /* પહોળાઈ 80px */
+        font-size: 17px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+    #lessonPlanTable td:nth-child(3) {
+        width: 20px; /* પહોળાઈ 60px */
+        font-size: 17px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+     #lessonPlanTable td:nth-child(4) {
+        width: 100px; /* પહોળાઈ 60px */
+        font-size: 14px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+     #lessonPlanTable td:nth-child(5) {
+        width: 80px; /* પહોળાઈ 60px */
+        font-size: 16px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+    #lessonPlanTable td:nth-child(6) {
+        width: 100px; /* પહોળાઈ 100px */
+        font-size: 16px; /* ફૉન્ટ સાઇઝ 12px */
+    }
+    /* પાંદડા (row) ની ઊંચાઈ ઘટાડવા માટે */
+    #lessonPlanTable tbody tr {
+        height: 30px; /* દરેક પાંદડાની ઊંચાઈ 30px */
+    }
 
 
     </style>
@@ -335,7 +377,6 @@
                 <select id="material" multiple>
                     <option value="ચોક,ડસ્ટર,પાઠ્યપુસ્તક">ચોક,ડસ્ટર,પાઠ્યપુસ્તક</option>
                      <option value="બ્લૅકબૉર્ડ">બ્લૅકબૉર્ડ</option>
-                     <option value="G-Shala+">G-Shala+</option>
                     <option value="G-Shala">G-Shala</option>
                     <option value="G-Shala+">G-Shala+</option>
                     <option value="સ્માર્ટબોર્ડ">સ્માર્ટબોર્ડ</option>
@@ -364,78 +405,169 @@
 
 
 
-        <div class="flashcard table-container" id="tableFlashcard">
-            <h2>દૈનિક નોંધપોથી</h2>
-            <div class="header-info">
-             <h1 id="username-heading"></h1>
-    
-    <!-- Heading for School Name -->
-    <h2 id="school-name-heading"></h2>
+       <!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>દૈનિક નોંધપોથી</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.0.0-rc.7/html2canvas.min.js"></script>
+    <style>
+        /* Styling adjustments for better PDF fit */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .flashcard {
+            color: #000;
+            font-size: 14px;
+            width: 100%;
+            height: 100%;
+            padding-top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2, p {
+            color: #333;
+        }
+
+        #lessonPlanTable {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        /* Table heading and cell styling */
+        #lessonPlanTable th {
+            border: 1px solid #888;
+            padding: 5px;
+            text-align: center;
+            background-color: #e0e0e0;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #lessonPlanTable td {
+            border: 1px solid #888;
+            padding: 5px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .signature-box {
+            width: 150px;
+            height: 35px;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="flashcard table-container" id="tableFlashcard">
+        <h2>દૈનિક નોંધપોથી</h2>
+        <div class="header-info">
+            <h1 id="username-heading"></h1>
+            <h2 id="school-name-heading"></h2>
+
+            <script>
+                const username = localStorage.getItem('teacherName');
+                const schoolName = localStorage.getItem('schoolName');
+
+                if (username) {
+                    document.getElementById('username-heading').innerText = `${username}`;
+                } else {
+                    document.getElementById('username-heading').innerText = 'Welcome, Guest!';
+                }
+
+                if (schoolName) {
+                    document.getElementById('school-name-heading').innerText = `${schoolName}`;
+                } else {
+                    document.getElementById('school-name-heading').innerText = 'School Name not found!';
+                }
+            </script>
+            <div style="display: flex; justify-content: space-between;">
+                <p id="selectedDate" style="margin: 0;">તારીખ:</p>
+                <p id="selectedDay" style="margin: 0;">વાર:</p>
+            </div>
+        </div>
+        <table id="lessonPlanTable">
+            <thead>
+                <tr>
+                    <th>તાસ</th>
+                    <th>ધોરણ અને વિષય</th>
+                    <th>પ્રકરણ</th>
+                    <th>અધ્યયન નિસ્પતિ અને મુદા</th>
+                    <th>શૈક્ષણિક સાધનો અને પ્રવૃતિ</th>
+                    <th>ગૃહકાર્ય</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Rows will be added here dynamically -->
+                
+            </tbody>
+        </table>
+        <div style="display: flex; justify-content: space-between; margin-top: 50px;">
+            <div style="text-align: center;">
+                <p>શિક્ષકની સહી</p>
+                <div class="signature-box"></div>
+            </div>
+            <div style="text-align: center;">
+                <p>આચાર્યની સહી</p>
+                <div class="signature-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <button id="download-pdf">PDF ડાઉનલોડ કરો</button>
+    <button onclick="printTable()">Print</button>
+    <button onclick="exportToExcel()">Export to Excel</button>
 
     <script>
-        // Retrieve the username and school name from localStorage
-        const username = localStorage.getItem('username');
-        const schoolName = localStorage.getItem('schoolName');
+        document.getElementById('download-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const tableFlashcard = document.getElementById('tableFlashcard');
 
-        // Update the h1 element with the username
-        if (username) {
-            document.getElementById('username-heading').innerText = `${username}`;
-        } else {
-            document.getElementById('username-heading').innerText = 'Welcome, Guest!';
-        }
+            // Adjust margin if rows are less than 5 to center content on page
+            const rowCount = document.getElementById('tableBody').getElementsByTagName('tr').length;
+            if (rowCount <= 4) {
+                tableFlashcard.style.paddingTop = '100px';
+            } else {
+                tableFlashcard.style.paddingTop = '0px';
+            }
 
-        // Update the h2 element with the school name
-        if (schoolName) {
-            document.getElementById('school-name-heading').innerText = `${schoolName}`;
-        } else {
-            document.getElementById('school-name-heading').innerText = 'School Name not found!';
-        }
+            html2canvas(tableFlashcard, { scale: 1.5, backgroundColor: '#fff' }).then(function(canvas) {
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/jpeg', 0.7);
+
+                const imgWidth = 190;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+
+                let position = 0;
+
+                pdf.addImage(imgData, 'JPEG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save('dainik_nondapothi.pdf');
+            });
+        });
     </script>
+</body>
+</html>
 
-
-<p id="selectedDate">તારીખ:</p>
-                <p id="selectedDay">વાર:</p>
-
-
-            </div>
-            <table id="lessonPlanTable">
-                <thead>
-                    <tr>
-                        <th>તાસ</th>
-                        <th>ધોરણ અને વિષય</th>
-                        <th>પ્રકરણ</th>
-                        <th>અધ્યયન નિસ્પતિ અને મુદા</th>
-                        <th>શૈક્ષણિક સાધનો અને પ્રવૃતિ</th>
-                        <th>ગૃહકાર્ય</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Rows will be added here dynamically -->
-                </tbody>
-            </table>
-
-        </div>
-        
-    <div style="display: flex; justify-content: space-between; margin-top: 50px;">
-    <div style="text-align: center;">
-        <p>શિક્ષકની સહી</p>
-        <div style="width: 150px; height: 35px; border: 1px solid black;"></div>
-    </div>
-    <div style="text-align: center;">
-        <p>આચાર્યની સહી</p>
-        <div style="width: 150px; height: 35px; border: 1px solid black;"></div>
-    </div>
-</div>
-
-    </div>
-
-        <div class="button-group">
-            <button onclick="printTable()">Print</button>
-            <button id="download-btn">Download PDF</button>
-
-            <button onclick="exportToExcel()">Export to Excel</button>
-            <button onclick="generateWord()">Generate Word Document</button>
-        </div>
+    
     </div>
     <!-- Add the Remove Row and Undo buttons -->
 
@@ -924,16 +1056,19 @@ function populateSubcategories() {
             // document.getElementById('selectedDay').innerText = 'Day:'; // Clear displayed day
         }
 
-        function printTable() {
-            const printContents = document.getElementById('tableFlashcard').innerHTML;
-            const newWindow = window.open('', '', 'width=900,height=600');
-            newWindow.document.write('<html><head><title>Print</title>');
-            newWindow.document.write('</head><body>');
-            newWindow.document.write(printContents);
-            newWindow.document.write('</body></html>');
-            newWindow.document.close();
-            newWindow.print();
-        }
+ function printTable() {
+    const printContents = document.getElementById('tableFlashcard').innerHTML;
+    const teacherSignature = document.getElementById('teacherSignature').innerHTML;
+
+    const newWindow = window.open('', '', 'width=900,height=600');
+    newWindow.document.write('<html><head><title>Print</title></head><body>');
+    newWindow.document.write(printContents);
+    newWindow.document.write('<br><br>'); // Add space before the signature
+    newWindow.document.write('<div>' + teacherSignature + '</div>'); // Add the signature
+    newWindow.document.write('</body></html>');
+    newWindow.document.close();
+    newWindow.print();
+}
 
         function generatePDF() {
             const printContents = document.getElementById('tableFlashcard').innerHTML;
@@ -1122,7 +1257,7 @@ function clearSubcategoryDropdowns() {
             h1, h2, p {
                 text-align: center;
                 font-weight: bold;
-                margin-bottom: 15px; /* Kept for spacing */
+                margin-bottom: 5px; /* Kept for spacing */
             }
             @media print {
                 body, html {
